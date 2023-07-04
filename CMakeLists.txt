@@ -27,7 +27,7 @@ generate_dynamic_reconfigure_options(
 )
 
 INCLUDE_DIRECTORIES(
-  /opt/mvIMPACT_acquire
+  /opt/mvIMPACT_Acquire
   include
   ${Eigen_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
@@ -39,10 +39,10 @@ LIST(APPEND LINK_LIBS
   ${Boost_LIBRARIES}
   ${OpenCV_LIBS}
   ${catkin_LIBRARIES}
-  /opt/mvIMPACT_acquire/lib/x86_64/libmvPropHandling.so
-  /opt/mvIMPACT_acquire/lib/x86_64/libmvGenTLProducer.so
-  /opt/mvIMPACT_acquire/lib/x86_64/libmvGenTLConsumer.so
-  /opt/mvIMPACT_acquire/lib/x86_64/libmvDeviceManager.so
+  /opt/mvIMPACT_Acquire/lib/armhf/libmvPropHandling.so
+  /opt/mvIMPACT_Acquire/lib/armhf/libmvGenTLProducer.so
+  /opt/mvIMPACT_Acquire/lib/armhf/libmvGenTLConsumer.so
+  /opt/mvIMPACT_Acquire/lib/armhf/libmvDeviceManager.so
 )
 
 LIST(APPEND SOURCEFILES
