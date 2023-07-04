@@ -38,6 +38,7 @@ using namespace mvIMPACT::acquire;
 void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Device* pDev)
 //-----------------------------------------------------------------------------
 {
+	
 
   mvIMPACT::acquire::GenICam::AcquisitionControl ac( pDev );
   mvIMPACT::acquire::ImageDestination id( pDev );
@@ -60,9 +61,6 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
       ROS_WARN_STREAM("autoExpLowerLimit MUST BE MINOR than autoExpUpperLimit!!, request will be skipped!");
 
   }
-  conditionalSetEnumPropertyByString(id.scalerMode, config.scalerMode);
-  conditionalSetProperty(id.imageWidth, config.scaledWidth);
-  conditionalSetProperty(id.imageHeight, config.scaledHeight);
   conditionalSetEnumPropertyByString(ip.gainOffsetKneeEnable, config.gainKneeEnable?"On":"Off");
   conditionalSetProperty(ip.gainOffsetKneeMasterOffset_pc, config.gainPerc);
   conditionalSetEnumPropertyByString(ac.mvAcquisitionFrameRateEnable,  config.manualFps);
@@ -70,12 +68,7 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
   conditionalSetEnumPropertyByString(anctrl.balanceWhiteAuto, config.Wb_setting );
   conditionalSetProperty(anctrl.blackLevel, config.blk_level );
   conditionalSetEnumPropertyByString(ip.LUTEnable, config.lutGamma);
-  conditionalSetEnumPropertyByString(ip.colorTwistEnable, config.colorCorrectionsEnable);
-  if(ip.colorTwistEnable.readS() == "On"){
-    conditionalSetEnumPropertyByString(ip.colorTwistInputCorrectionMatrixEnable, "On");
-    conditionalSetEnumPropertyByString(ip.colorTwistInputCorrectionMatrixMode, "DeviceSpecific");
-    conditionalSetEnumPropertyByString(ip.colorTwistOutputCorrectionMatrixEnable, "On");
-    ip.setSaturation(( config.Saturation / 100 ) );
+  if(ip.LUTEnable.readS() == "On"){
     const unsigned int LUTCnt = ip.getLUTParameterCount();
 
     for( unsigned int i = 0; i < LUTCnt; i++ )
@@ -85,12 +78,6 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
     }
 
   }
-  else
-  {
-    conditionalSetEnumPropertyByString(ip.colorTwistInputCorrectionMatrixEnable, "Off");
-    conditionalSetEnumPropertyByString(ip.colorTwistInputCorrectionMatrixMode, "DeviceSpecific");
-    conditionalSetEnumPropertyByString(ip.colorTwistOutputCorrectionMatrixEnable, "Off");
-  }
 
 }
 
@@ -99,16 +86,14 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
 //-----------------------------------------------------------------------------
 {
 
+
   mvIMPACT::acquire::GenICam::AcquisitionControl ac( pDev );
   mvIMPACT::acquire::ImageDestination id( pDev );
   mvIMPACT::acquire::ImageProcessing ip( pDev );
   mvIMPACT::acquire::GenICam::AnalogControl anctrl( pDev );
-
+	
 
   double exp_time = ac.exposureTime.read();
-  string scaler_Mode = id.scalerMode.readS();
-  int defaultScalerWidth = 640;
-  int defaultScalerHeigth = 480;
   bool gainOffsetKneeEnable = ip.gainOffsetKneeEnable.read();
   double gainOffsetKneeMasterOffset_pc = ip.gainOffsetKneeMasterOffset_pc.read();
   string manual_fps = ac.mvAcquisitionFrameRateEnable.readS();
@@ -116,19 +101,15 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   string white_balance_init = anctrl.balanceWhiteAuto.readS();
   double black_level_init = anctrl.blackLevel.read();
   string lut_enable_init = ip.LUTEnable.readS();
-  string colorTwistMat_init = ip.colorTwistEnable.readS();
   int saturation_level_init = 100;
   string auto_exposure_auto_init = ac.exposureAuto.readS();
   int auto_exposure_lowerLimit = 10;
   int auto_exposure_upperLimit = 20000;
   double gamma_gain_init = 1.0;
-
+  	
 
 
   n.getParam("exposureTime", exp_time);
-  n.getParam("scalerMode", scaler_Mode);
-  n.getParam("scaledWidth", defaultScalerWidth);
-  n.getParam("scaledHeight", defaultScalerHeigth);
   n.getParam("gainKneeEnable",gainOffsetKneeEnable);
   n.getParam("gainPerc",gainOffsetKneeMasterOffset_pc);
   n.getParam("manualFps",manual_fps);
@@ -136,7 +117,6 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   n.getParam("Wb_setting", white_balance_init);
   n.getParam("blackLevel", black_level_init);
   n.getParam("lutGamma", lut_enable_init);
-  n.getParam("colorCorrectionsEnable", colorTwistMat_init);
   n.getParam("Saturation", saturation_level_init);
   n.getParam("autoExposure", auto_exposure_auto_init);
   n.getParam("autoExpLowerLimit", auto_exposure_lowerLimit);
@@ -178,8 +158,15 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     }
     else if (nChannels == 3)
     {
+	/**CODICE MODIFICATO PER RESIZE IMMAGINE! CAMBIARE VALORI PER OTTENERE DIMENSIONI
+	DIVERSE!**/
+	int scaled_width = 640;
+	int scaled_heigth = 480;
         cv::Mat camImgWrapped(heig, wid, CV_8UC3, pRequest->imageData.read(), pitch);
-        img = camImgWrapped.clone();
+	cv::Mat destination;
+        resize(camImgWrapped, destination, Size(scaled_width, scaled_heigth), 0, 0, INTER_CUBIC);
+        img = destination.clone();
+        //img = camImgWrapped.clone();
         //imshow("bluefox3_wow3", img );
         //waitKey(1);
         bridge_image->encoding = sensor_msgs::image_encodings::BGR8;
@@ -369,8 +356,8 @@ bool configureDevice( Device* pDev )
 {
 
   string settingName;
-  int width = 1280;
-  int height = 1024;
+  int width = 1280; //EDITARE max 1280
+  int height = 1024; //EDITARE max 1024
   /** 'PixelFormat' defines a dictionary. Valid values are:
   [17301512]: BayerGR8
   [17825804]: BayerGR10
@@ -441,6 +428,7 @@ bool configureDevice( Device* pDev )
 
         mvIMPACT::acquire::GenICam::ImageFormatControl ifc( pDev );
 
+
         if( width > 0 )
         {
             ifc.width.write( width );
@@ -459,8 +447,8 @@ bool configureDevice( Device* pDev )
             ac.acquisitionMode.writeS( acquisitionMode );
         }
         acquisitionMode = ac.acquisitionMode.readS();
-
-        //calculate offest if the original width = 1280 and height=1024 is different
+	
+	//calculate offest if the original width = 1280 and height=1024 is different
         int offsetX = ( (1280 - width) / 2 );
         int offsetY = ( (1024 - height) / 2 );
         if(offsetX>0 && ifc.offsetX.isValid() && ifc.offsetX.isWriteable())
@@ -473,7 +461,6 @@ bool configureDevice( Device* pDev )
           ifc.offsetY.write(offsetY);
           //cout << "offsetY set  to: " << offsetY << endl;
         }
-
 
         /*---------------setup some settings for FrameRate---------------*/
         //displayPropertyData( ac.mvAcquisitionFrameRateEnable );
@@ -661,7 +648,7 @@ bool configureDevice( Device* pDev )
         alldone = false;
       }
 
-
+	
       return alldone;
 
   }
