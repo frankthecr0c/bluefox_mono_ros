@@ -51,7 +51,7 @@ sudo chmod +xinstall_mvGenTL_Acquire_ARM.sh
 ./install_mvGenTL_Acquire_ARM.sh
 ```
 
-**Note** Both the two files (.sh and the .tgz archive) must be in the same directory.
+**Note** Both the two files (.sh and the .tgz archive) must be in the same directory.<br>
 **Note1** The installation script will ask to install other drivers: 
  - GEV_SUPPORT
  - PCIE_SUPPORT
