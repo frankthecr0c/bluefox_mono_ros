@@ -52,6 +52,17 @@ sudo chmod +xinstall_mvGenTL_Acquire_ARM.sh
 ```
 
 **Note** Both the two files (.sh and the .tgz archive) must be in the same directory.
+**Note1** The installation script will ask to install other drivers: 
+ - GEV_SUPPORT
+ - PCIE_SUPPORT
+ - U3V_SUPPORT
+   
+   GEV and PCIE usually need thee the kernel to be recompiled, so if you want to avoid it skip the installation of them. If the script doesn't allow you to select, modify it changing the following parameters:<br>
+   
+    GEV_SUPPORT=FALSE<br>
+    U3V_SUPPORT=TRUE<br>
+    PCIE_SUPPORT=FALSE<br>
+
 #### Testing the driver installation 
 If the installation succeeded a folder called "mvImpac_Acquire" would be created on 
 the /opt/ directory. 
