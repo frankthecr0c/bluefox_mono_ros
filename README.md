@@ -16,6 +16,8 @@ tested on ros1:
 
 ## Installation
 
+It doesn't work imho....
+
 The installation is two-steps process: you first need to install the driver according 
 to your hardware platform: x-86_64 or arm 64. 
 
