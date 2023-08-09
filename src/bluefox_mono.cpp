@@ -80,8 +80,8 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
 
   }
 
-  conditionalSetEnumPropertyByString(ifc.reverseX, config.flip_horizontal);
-  conditionalSetEnumPropertyByString(ifc.reverseY, config.flip_vertical);
+  conditionalSetProperty(ifc.reverseX, config.flip_horizontal);
+  conditionalSetProperty(ifc.reverseY, config.flip_vertical);
 
 
 }
