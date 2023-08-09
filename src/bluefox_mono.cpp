@@ -185,10 +185,14 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     }
 
     bridge_image->image = img;
+    /* -- Add timestamp header and frame_id */
+    ros::Time time = ros::Time::now();
+    bridge_image->header.stamp = time;
+    bridge_image->header.frame_id = "/bluefox_camera";
     /* -- Convert image to a message and publish it -- */
-		sensor_msgs::Image image_message;
-		bridge_image->toImageMsg(image_message);
-		image_publisher->publish(image_message,cam_info);
+    sensor_msgs::Image image_message;
+    bridge_image->toImageMsg(image_message);
+    image_publisher->publish(image_message,cam_info);
 
     ros::spinOnce();
 
