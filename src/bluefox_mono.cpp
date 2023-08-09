@@ -44,6 +44,7 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
   mvIMPACT::acquire::ImageDestination id( pDev );
   mvIMPACT::acquire::ImageProcessing ip( pDev );
   mvIMPACT::acquire::GenICam::AnalogControl anctrl( pDev );
+  mvIMPACT::acquire::GenICam::ImageFormatControl ifc( pDev );
 
   conditionalSetEnumPropertyByString(ac.exposureAuto, config.autoExposure);
   if(ac.exposureAuto.readS()=="Off")
@@ -79,6 +80,10 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
 
   }
 
+  conditionalSetEnumPropertyByString(ifc.reverseX, config.flip_horizontal);
+  conditionalSetEnumPropertyByString(ifc.reverseY, config.flip_vertical);
+
+
 }
 
 //-----------------------------------------------------------------------------
@@ -108,28 +113,28 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   double gamma_gain_init = 1.0;
   bool rotateX = false;
   bool rotateY = false;
-  int scaled_width = 640;
-  int scaled_heigth = 480;
+  int scaled_width = 1280;
+  int scaled_heigth = 1024;
   	
 
 
-  n.getParam("exposureTime", exp_time);
-  n.getParam("gainKneeEnable",gainOffsetKneeEnable);
-  n.getParam("gainPerc",gainOffsetKneeMasterOffset_pc);
-  n.getParam("manualFps",manual_fps);
-  n.getParam("fpsValue",fps_value);
-  n.getParam("Wb_setting", white_balance_init);
-  n.getParam("blackLevel", black_level_init);
-  n.getParam("lutGamma", lut_enable_init);
-  n.getParam("Saturation", saturation_level_init);
-  n.getParam("autoExposure", auto_exposure_auto_init);
-  n.getParam("autoExpLowerLimit", auto_exposure_lowerLimit);
-  n.getParam("autoExpUpperLimit", auto_exposure_upperLimit);
-  n.getParam("gammaGain", gamma_gain_init);
-  n.getParam("scaledWidth", scaled_width);
-  n.getParam("scaledWidth", scaled_heigth);
-  n.getParam("flip_horizontal", rotateX);
-  n.getParam("flip_vertical", rotateY);
+  n.setParam("exposureTime", exp_time);
+  n.setParam("gainKneeEnable",gainOffsetKneeEnable);
+  n.setParam("gainPerc",gainOffsetKneeMasterOffset_pc);
+  n.setParam("manualFps",manual_fps);
+  n.setParam("fpsValue",fps_value);
+  n.setParam("Wb_setting", white_balance_init);
+  n.setParam("blackLevel", black_level_init);
+  n.setParam("lutGamma", lut_enable_init);
+  n.setParam("Saturation", saturation_level_init);
+  n.setParam("autoExposure", auto_exposure_auto_init);
+  n.setParam("autoExpLowerLimit", auto_exposure_lowerLimit);
+  n.setParam("autoExpUpperLimit", auto_exposure_upperLimit);
+  n.setParam("gammaGain", gamma_gain_init);
+  n.setParam("scaledWidth", scaled_width);
+  n.setParam("scaledWidth", scaled_heigth);
+  n.setParam("flip_horizontal", rotateX);
+  n.setParam("flip_vertical", rotateY);
 
 
 
@@ -137,13 +142,18 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
 
 //-----------------------------------------------------------------------------
 void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridge_image, int count,
-  camera_info_manager::CameraInfoManager* camera_info_mgr, image_transport::CameraPublisher* image_publisher)
+  camera_info_manager::CameraInfoManager* camera_info_mgr, image_transport::CameraPublisher* image_publisher, const ros::NodeHandle& n)
 //-----------------------------------------------------------------------------
 {
     const int wid = pRequest->imageWidth.read();
     const int heig = pRequest->imageHeight.read();
     const int pitch = pRequest->imageLinePitch.read();
     const int nChannels = pRequest->imageChannelCount.read();
+    int scaled_width
+    int scaled_heigth
+    n.getParam("scaledWidth", scaled_width);
+    n.getParam("scaledWidth", scaled_heigth);
+
 
     //ros
     /* -- fill in information in cv_bridge image -- */
@@ -226,10 +236,10 @@ bool liveLoop(Device* pDev)
 		image_transport::CameraPublisher image_publisher(it.advertiseCamera("image_raw",100));
 
     //setting up dynamic reconfigure ROS
-		dynamic_reconfigure::Server<bluefox_mono_ros::DynamicConfConfig> server;
-		dynamic_reconfigure::Server<bluefox_mono_ros::DynamicConfConfig>::CallbackType f;
-		f = boost::bind(&callback, _1, _2, pDev);
-		server.setCallback(f);;
+    dynamic_reconfigure::Server<bluefox_mono_ros::DynamicConfConfig> server;
+    dynamic_reconfigure::Server<bluefox_mono_ros::DynamicConfConfig>::CallbackType f;
+    f = boost::bind(&callback, _1, _2, pDev);
+    server.setCallback(f);;
 
     //setting up RosParameters
     initializeRosParameters(pDev, n);
@@ -293,7 +303,7 @@ bool liveLoop(Device* pDev)
             {
                 ++cnt;
                 // send current image to Ros by the function sendImageToRos
-                sendImageToRos( pRequest, image_placeholder, &bridge_image, cnt, &camera_info_mgr, &image_publisher);
+                sendImageToRos( pRequest, image_placeholder, &bridge_image, cnt, &camera_info_mgr, &image_publisher, n);
 
                 // here we can display some statistical information every 100th image
                 if( cnt % 100 == 0 )
