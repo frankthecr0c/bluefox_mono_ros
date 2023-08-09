@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>bluefox_mono_ros </name>
+  <name>bluefox_mono_ros</name>
   <version>0.0.0</version>
   <description>Bluefox mono camera driver</description>
 
