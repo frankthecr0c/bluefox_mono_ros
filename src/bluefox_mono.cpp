@@ -106,6 +106,10 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   int auto_exposure_lowerLimit = 10;
   int auto_exposure_upperLimit = 20000;
   double gamma_gain_init = 1.0;
+  bool rotateX = false;
+  bool rotateY = false;
+  int scaled_width = 640;
+  int scaled_heigth = 480;
   	
 
 
@@ -122,6 +126,11 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   n.getParam("autoExpLowerLimit", auto_exposure_lowerLimit);
   n.getParam("autoExpUpperLimit", auto_exposure_upperLimit);
   n.getParam("gammaGain", gamma_gain_init);
+  n.getParam("scaledWidth", scaled_width);
+  n.getParam("scaledWidth", scaled_heigth);
+  n.getParam("flip_horizontal", rotateX);
+  n.getParam("flip_vertical", rotateY);
+
 
 
 }
@@ -160,8 +169,6 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     {
 	/**CODICE MODIFICATO PER RESIZE IMMAGINE! CAMBIARE VALORI PER OTTENERE DIMENSIONI
 	DIVERSE!**/
-	int scaled_width = 640;
-	int scaled_heigth = 480;
         cv::Mat camImgWrapped(heig, wid, CV_8UC3, pRequest->imageData.read(), pitch);
 	cv::Mat destination;
         resize(camImgWrapped, destination, Size(scaled_width, scaled_heigth), 0, 0, INTER_CUBIC);
@@ -583,6 +590,11 @@ bool configureDevice( Device* pDev )
         if( ip.colorTwistOutputCorrectionMatrixMode.isValid() && ip.colorTwistOutputCorrectionMatrixMode.isWriteable() )
             conditionalSetEnumPropertyByString( ip.colorTwistOutputCorrectionMatrixMode, "XYZToAdobeRGB_D50" );
 
+        /****** Settings for mirroring X and Y ********/
+        if(ifc.reverseX.isValid() && ifc.reverseX.isWriteable())
+            ifc.reverseX.write(rotateX);
+        if(ifc.reverseY.isValid() && ifc.reverseY.isWriteable())
+            ifc.reverseX.write(rotateY);
 
         /****** Settings for LUT Settings ********/
 
