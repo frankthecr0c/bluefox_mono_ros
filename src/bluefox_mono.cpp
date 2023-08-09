@@ -592,9 +592,9 @@ bool configureDevice( Device* pDev )
 
         /****** Settings for mirroring X and Y ********/
         if(ifc.reverseX.isValid() && ifc.reverseX.isWriteable())
-            ifc.reverseX.write(rotateX);
+            conditionalSetEnumPropertyByString(ifc.reverseX, "Off");
         if(ifc.reverseY.isValid() && ifc.reverseY.isWriteable())
-            ifc.reverseX.write(rotateY);
+            conditionalSetEnumPropertyByString(ifc.reverseY, "Off");
 
         /****** Settings for LUT Settings ********/
 
