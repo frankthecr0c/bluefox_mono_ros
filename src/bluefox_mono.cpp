@@ -149,8 +149,8 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     const int heig = pRequest->imageHeight.read();
     const int pitch = pRequest->imageLinePitch.read();
     const int nChannels = pRequest->imageChannelCount.read();
-    int scaled_width
-    int scaled_heigth
+    int scaled_width;
+    int scaled_heigth;
     n.getParam("scaledWidth", scaled_width);
     n.getParam("scaledWidth", scaled_heigth);
 
