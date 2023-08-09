@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+>
+
+  <xacro:macro name="bluefox_camera" params="name ros_topic parent_link">
+    <xacro:camera_module name="${name}" ros_topic="${ros_topic}" parent_link="${parent_link}"
+      length="0.042" width="0.038" height="0.038" mass="0.200" x_offset="0.0" y_offset="0.0" z_offset="0.145"
+      "roll=3.14159" "pitch=0.0" "yaw=0.0"
+      mesh="package://sick_tim/meshe/camera_module.stl" />
+  </xacro:macro>
+
+  <xacro:macro name="camera_module" params="name ros_topic parent_link length width height mass x_offset
+  y_offset z_offset roll pitch yaw mesh">
+    <!-- z_offset: distance between base plate and laser center (= center of mesh)
+    <link name="${name}_mount_link">
+      <inertial>
+        <mass value="0.001" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0"
+          iyy="0.000001" iyz="0.0" izz="0.000001" />
+      </inertial>
+    </link>
+    -->
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent_link}" />
+      <child link="${name}" />
+      <origin rpy="${roll} ${pitch} ${yaw}" xyz="${x_offset} ${y_offset} ${z_offset}"/>
+    </joint>
+
+    <link name="${name}">
+      <visual>
+        <geometry>
+          <mesh filename="${mesh}" />
+        </geometry>
+        <material name="blue" >
+          <color rgba="0 1 0 1" />
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="${mesh}" />
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 -0.026" />
+        <inertia ixx="${0.0833333 * mass * (width * width + height * height)}" ixy="0.0" ixz="0.0"
+          iyy="${0.0833333 * mass * (length * length + height * height)}" iyz="0.0"
+          izz="${0.0833333 * mass * (length * length + width * width)}" />
+      </inertial>
+    </link>
+  </xacro:macro>
+
+</robot>
