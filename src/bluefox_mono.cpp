@@ -133,7 +133,7 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   n.setParam("autoExpUpperLimit", auto_exposure_upperLimit);
   n.setParam("gammaGain", gamma_gain_init);
   n.setParam("scaledWidth", scaled_width);
-  n.setParam("scaledWidth", scaled_heigth);
+  n.setParam("scaledHeight", scaled_heigth);
   n.setParam("flip_horizontal", rotateX);
   n.setParam("flip_vertical", rotateY);
 
@@ -150,10 +150,10 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     const int heig = pRequest->imageHeight.read();
     const int pitch = pRequest->imageLinePitch.read();
     const int nChannels = pRequest->imageChannelCount.read();
-    int scaled_width;
-    int scaled_heigth;
+    int scaled_width=640;
+    int scaled_heigth=480;
     n.getParam("scaledWidth", scaled_width);
-    n.getParam("scaledWidth", scaled_heigth);
+    n.getParam("scaledHeight", scaled_heigth);
 
 
     //ros
@@ -602,10 +602,16 @@ bool configureDevice( Device* pDev )
             conditionalSetEnumPropertyByString( ip.colorTwistOutputCorrectionMatrixMode, "XYZToAdobeRGB_D50" );
 
         /****** Settings for mirroring X and Y ********/
-        if(ifc.reverseX.isValid() && ifc.reverseX.isWriteable())
-            conditionalSetEnumPropertyByString( ifc.reverseX, "Off" );
-        if(ifc.reverseY.isValid() && ifc.reverseY.isWriteable())
-           conditionalSetEnumPropertyByString( ifc.reverseY, "On" );
+       if(ifc.reverseX.isValid() && ifc.reverseX.isWriteable()){
+            mvIMPACT::acquire::TBoolean ok = bTrue;
+            ifc.reverseX.write(ok);
+             cout<< "-------------->reverseX:" << ifc.reverseX.read() << endl;
+        }
+        if(ifc.reverseY.isValid() && ifc.reverseY.isWriteable()){
+           mvIMPACT::acquire::TBoolean ok = bTrue;
+            ifc.reverseY.write(ok);
+           }
+	
 
         /****** Settings for LUT Settings ********/
 
