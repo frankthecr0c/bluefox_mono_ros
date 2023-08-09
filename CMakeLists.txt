@@ -62,3 +62,12 @@ add_dependencies(bluefox_mono_node ${PROJECT_NAME}_gencfg)
 include_directories(
   include ${catkin_INCLUDE_DIRS}
 )
+
+install(DIRECTORY launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
+install(DIRECTORY meshes/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/mesh)
+
+install(DIRECTORY urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf)
