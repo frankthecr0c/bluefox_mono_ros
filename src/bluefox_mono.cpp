@@ -89,11 +89,11 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
   }
   if (config.flip_vertical){
     mvIMPACT::acquire::TBoolean default_Yrot = bTrue;
-    ifc.reverseX.write(default_Yrot);
+    ifc.reverseY.write(default_Yrot);
   }
   else{
     mvIMPACT::acquire::TBoolean default_Yrot = bFalse;
-    ifc.reverseX.write(default_Yrot);
+    ifc.reverseY.write(default_Yrot);
   }
 
 }
