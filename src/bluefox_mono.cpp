@@ -79,11 +79,22 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
     }
 
   }
-  /*
-  ifc.reverseX.write(config.flip_horizontal);
-  ifc.reverseY.write(config.flip_vertical);
-*/
-
+  if (config.flip_horizontal){
+    mvIMPACT::acquire::TBoolean default_Xrot = bTrue;
+    ifc.reverseX.write(default_Xrot);
+   }
+  else{
+    mvIMPACT::acquire::TBoolean default_Xrot = bFalse;
+    ifc.reverseX.write(default_Xrot);
+  }
+  if (config.flip_vertical){
+    mvIMPACT::acquire::TBoolean default_Yrot = bTrue;
+    ifc.reverseX.write(default_Yrot);
+  }
+  else{
+    mvIMPACT::acquire::TBoolean default_Yrot = bFalse;
+    ifc.reverseX.write(default_Yrot);
+  }
 
 }
 
@@ -114,28 +125,28 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   double gamma_gain_init = 1.0;
   bool rotateX = false;
   bool rotateY = false;
-  int scaled_width = 1280;
-  int scaled_heigth = 1024;
+  int scaled_width = 640;
+  int scaled_heigth = 480;
   	
 
 
-  n.setParam("exposureTime", exp_time);
-  n.setParam("gainKneeEnable",gainOffsetKneeEnable);
-  n.setParam("gainPerc",gainOffsetKneeMasterOffset_pc);
-  n.setParam("manualFps",manual_fps);
-  n.setParam("fpsValue",fps_value);
-  n.setParam("Wb_setting", white_balance_init);
-  n.setParam("blackLevel", black_level_init);
-  n.setParam("lutGamma", lut_enable_init);
-  n.setParam("Saturation", saturation_level_init);
-  n.setParam("autoExposure", auto_exposure_auto_init);
-  n.setParam("autoExpLowerLimit", auto_exposure_lowerLimit);
-  n.setParam("autoExpUpperLimit", auto_exposure_upperLimit);
-  n.setParam("gammaGain", gamma_gain_init);
-  n.setParam("scaledWidth", scaled_width);
-  n.setParam("scaledHeight", scaled_heigth);
-  n.setParam("flip_horizontal", rotateX);
-  n.setParam("flip_vertical", rotateY);
+  n.getParam("exposureTime", exp_time);
+  n.getParam("gainKneeEnable",gainOffsetKneeEnable);
+  n.getParam("gainPerc",gainOffsetKneeMasterOffset_pc);
+  n.getParam("manualFps",manual_fps);
+  n.getParam("fpsValue",fps_value);
+  n.getParam("Wb_setting", white_balance_init);
+  n.getParam("blackLevel", black_level_init);
+  n.getParam("lutGamma", lut_enable_init);
+  n.getParam("Saturation", saturation_level_init);
+  n.getParam("autoExposure", auto_exposure_auto_init);
+  n.getParam("autoExpLowerLimit", auto_exposure_lowerLimit);
+  n.getParam("autoExpUpperLimit", auto_exposure_upperLimit);
+  n.getParam("gammaGain", gamma_gain_init);
+  n.getParam("scaledWidth", scaled_width);
+  n.getParam("scaledHeight", scaled_heigth);
+  n.getParam("flip_horizontal", rotateX);
+  n.getParam("flip_vertical", rotateY);
 
 
 
@@ -603,13 +614,12 @@ bool configureDevice( Device* pDev )
 
         /****** Settings for mirroring X and Y ********/
        if(ifc.reverseX.isValid() && ifc.reverseX.isWriteable()){
-            mvIMPACT::acquire::TBoolean ok = bTrue;
-            ifc.reverseX.write(ok);
-             cout<< "-------------->reverseX:" << ifc.reverseX.read() << endl;
+            mvIMPACT::acquire::TBoolean default_Xrot = bFalse;
+            ifc.reverseX.write(default_Xrot);
         }
         if(ifc.reverseY.isValid() && ifc.reverseY.isWriteable()){
-           mvIMPACT::acquire::TBoolean ok = bTrue;
-            ifc.reverseY.write(ok);
+           mvIMPACT::acquire::TBoolean default_Yrot = bFalse;
+            ifc.reverseY.write(default_Yrot);
            }
 	
 
