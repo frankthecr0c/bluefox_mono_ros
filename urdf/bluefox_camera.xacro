@@ -5,8 +5,7 @@
   <xacro:macro name="bluefox_camera" params="name ros_topic parent_link">
     <xacro:camera_module name="${name}" ros_topic="${ros_topic}" parent_link="${parent_link}"
       length="0.042" width="0.038" height="0.038" mass="0.200" x_offset="0.0" y_offset="0.0" z_offset="0.145"
-      "roll=3.14159" "pitch=0.0" "yaw=0.0"
-      mesh="package://sick_tim/meshe/camera_module.stl" />
+      "roll=3.14" "pitch=0.0" "yaw=0.0" mesh="package://sick_tim/meshe/camera_module.stl" />
   </xacro:macro>
 
   <xacro:macro name="camera_module" params="name ros_topic parent_link length width height mass x_offset
