@@ -79,9 +79,9 @@ void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Devic
     }
 
   }
+  ifc.reverseX.write(config.flip_horizontal);
+  ifc.reverseY.write(config.flip_vertical);
 
-  conditionalSetProperty(ifc.reverseX, config.flip_horizontal);
-  conditionalSetProperty(ifc.reverseY, config.flip_vertical);
 
 
 }
@@ -602,9 +602,9 @@ bool configureDevice( Device* pDev )
 
         /****** Settings for mirroring X and Y ********/
         if(ifc.reverseX.isValid() && ifc.reverseX.isWriteable())
-            conditionalSetEnumPropertyByString(ifc.reverseX, "Off");
+            ifc.reverseX.write(false);
         if(ifc.reverseY.isValid() && ifc.reverseY.isWriteable())
-            conditionalSetEnumPropertyByString(ifc.reverseY, "Off");
+            ifc.reverseY.write(false);
 
         /****** Settings for LUT Settings ********/
 
