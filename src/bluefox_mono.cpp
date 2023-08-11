@@ -487,12 +487,12 @@ bool configureDevice( Device* pDev )
         if(offsetX>0 && ifc.offsetX.isValid() && ifc.offsetX.isWriteable())
         {
           ifc.offsetX.write(offsetX);
-          //cout << "offsetX set  to: " << offsetX << endl;
+          cout << "offsetX set  to: " << offsetX << endl;
         }
         if(offsetY>0  && ifc.offsetY.isValid() && ifc.offsetY.isWriteable())
         {
           ifc.offsetY.write(offsetY);
-          //cout << "offsetY set  to: " << offsetY << endl;
+          cout << "offsetY set  to: " << offsetY << endl;
         }
 
         /*---------------setup some settings for FrameRate---------------*/
