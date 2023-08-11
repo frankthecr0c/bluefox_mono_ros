@@ -167,7 +167,7 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     int scaled_width=1280;
     int scaled_heigth=1024;
     bool scaler_enable = false;
-    n.setParam("scalerEnable", scaler_enable);
+    n.getParam("scalerEnable", scaler_enable);
     n.getParam("scaledWidth", scaled_width);
     n.getParam("scaledHeight", scaled_heigth);
 
