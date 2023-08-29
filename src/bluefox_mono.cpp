@@ -38,7 +38,7 @@ using namespace mvIMPACT::acquire;
 void callback(bluefox_mono_ros::DynamicConfConfig &config, uint32_t level, Device* pDev)
 //-----------------------------------------------------------------------------
 {
-
+	
 
   mvIMPACT::acquire::GenICam::AcquisitionControl ac( pDev );
   mvIMPACT::acquire::ImageDestination id( pDev );
@@ -108,7 +108,7 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   mvIMPACT::acquire::ImageDestination id( pDev );
   mvIMPACT::acquire::ImageProcessing ip( pDev );
   mvIMPACT::acquire::GenICam::AnalogControl anctrl( pDev );
-
+	
 
   double exp_time = ac.exposureTime.read();
   bool gainOffsetKneeEnable = ip.gainOffsetKneeEnable.read();
@@ -128,7 +128,7 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
   bool rotateY = false;
   int scaled_width = 1280;
   int scaled_heigth = 1024;
-
+  	
 
 
   n.setParam("exposureTime", exp_time);
@@ -167,7 +167,7 @@ void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridg
     int scaled_width=1280;
     int scaled_heigth=1024;
     bool scaler_enable = false;
-    n.setParam("scalerEnable", scaler_enable);
+    n.getParam("scalerEnable", scaler_enable);
     n.getParam("scaledWidth", scaled_width);
     n.getParam("scaledHeight", scaled_heigth);
 
@@ -250,7 +250,7 @@ bool liveLoop(Device* pDev)
     ros::NodeHandle n("~");
     image_transport::ImageTransport it(n);
     cv_bridge::CvImage bridge_image;
-    camera_info_manager::CameraInfoManager camera_info_mgr(n,"bluefox_camera");
+    camera_info_manager::CameraInfoManager camera_info_mgr(n,"Bluefox_mono");
 		image_transport::CameraPublisher image_publisher(it.advertiseCamera("image_raw",100));
 
     //setting up dynamic reconfigure ROS
