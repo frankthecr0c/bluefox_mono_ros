@@ -2,7 +2,6 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/image_encodings.h>
-#include <std_msgs/Float64.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -157,9 +156,8 @@ void initializeRosParameters(Device* pDev, const ros::NodeHandle& n)
 }
 
 //-----------------------------------------------------------------------------
-void sendImageToRos( const Request* pRequest, mvIMPACT::acquire::GenICam::AcquisitionControl* ac, Mat img, cv_bridge::CvImage* bridge_image, int count,
-  camera_info_manager::CameraInfoManager* camera_info_mgr, image_transport::CameraPublisher* image_publisher,
-  ros::Publisher* shutter_speed_publisher, const ros::NodeHandle& n)
+void sendImageToRos( const Request* pRequest, Mat img, cv_bridge::CvImage* bridge_image, int count,
+  camera_info_manager::CameraInfoManager* camera_info_mgr, image_transport::CameraPublisher* image_publisher, const ros::NodeHandle& n)
 //-----------------------------------------------------------------------------
 {
     const int wid = pRequest->imageWidth.read();
@@ -169,10 +167,10 @@ void sendImageToRos( const Request* pRequest, mvIMPACT::acquire::GenICam::Acquis
     int scaled_width=1280;
     int scaled_heigth=1024;
     bool scaler_enable = false;
-    n.getParam("scalerEnable", scaler_enable);
+    n.setParam("scalerEnable", scaler_enable);
     n.getParam("scaledWidth", scaled_width);
     n.getParam("scaledHeight", scaled_heigth);
-    std_msgs::Float64 shutter_speed_msg;
+
 
     //ros
     /* -- fill in information in cv_bridge image -- */
@@ -199,7 +197,6 @@ void sendImageToRos( const Request* pRequest, mvIMPACT::acquire::GenICam::Acquis
 	/**CODICE MODIFICATO PER RESIZE IMMAGINE! CAMBIARE VALORI PER OTTENERE DIMENSIONI
 	DIVERSE!**/
         cv::Mat camImgWrapped(heig, wid, CV_8UC3, pRequest->imageData.read(), pitch);
-        shutter_speed_msg.data = ac->exposureTime.read();
 	    cv::Mat destination;
 	    if(scaler_enable){
             resize(camImgWrapped, destination, Size(scaled_width, scaled_heigth), 0, 0, INTER_CUBIC);
@@ -222,20 +219,16 @@ void sendImageToRos( const Request* pRequest, mvIMPACT::acquire::GenICam::Acquis
     //errore and stop
     }
 
-    // Save image
     bridge_image->image = img;
-
     /* -- Add timestamp header and frame_id */
     ros::Time time = ros::Time::now();
     bridge_image->header.stamp = time;
     bridge_image->header.frame_id = "/bluefox_camera";
-
-
     /* -- Convert image to a message and publish it -- */
     sensor_msgs::Image image_message;
     bridge_image->toImageMsg(image_message);
     image_publisher->publish(image_message,cam_info);
-    shutter_speed_publisher -> publish(shutter_speed_msg);
+
     ros::spinOnce();
 
 																// unlock the buffer to let the driver know that you no longer need this
@@ -257,11 +250,8 @@ bool liveLoop(Device* pDev)
     ros::NodeHandle n("~");
     image_transport::ImageTransport it(n);
     cv_bridge::CvImage bridge_image;
-    // publishers
     camera_info_manager::CameraInfoManager camera_info_mgr(n,"bluefox_camera");
-	image_transport::CameraPublisher image_publisher(it.advertiseCamera("image_raw",100));
-	ros::Publisher shutter_sp_publisher = n.advertise<std_msgs::Float64>("shutter_speed", 100);
-
+		image_transport::CameraPublisher image_publisher(it.advertiseCamera("image_raw",100));
 
     //setting up dynamic reconfigure ROS
     dynamic_reconfigure::Server<bluefox_mono_ros::DynamicConfConfig> server;
@@ -286,9 +276,6 @@ bool liveLoop(Device* pDev)
     // Pre-fill the capture queue with ALL buffers currently available. In case the acquisition engine is operated
     // manually, buffers can only be queued when they have been queued before the acquisition engine is started as well.
     // Even though there can be more than 1, for this sample we will work with the default capture queue
-
-    // Instantiate the acquisition controll to get access to some information about the acquisition
-    mvIMPACT::acquire::GenICam::AcquisitionControl ac( pDev );
 
     int requestResult = DMR_NO_ERROR;
     int requestCount = 0;
@@ -334,16 +321,16 @@ bool liveLoop(Device* pDev)
             {
                 ++cnt;
                 // send current image to Ros by the function sendImageToRos
-                sendImageToRos( pRequest, &ac,  image_placeholder, &bridge_image, cnt, &camera_info_mgr, &image_publisher, &shutter_sp_publisher, n);
+                sendImageToRos( pRequest, image_placeholder, &bridge_image, cnt, &camera_info_mgr, &image_publisher, n);
 
                 // here we can display some statistical information every 100th image
                 if( cnt % 100 == 0 )
                 {
 
-                    ROS_INFO("Info From %s :\n->Image count: %d \n->%s : %s \n->%s : %s \n->%s : %s \n->Image dimension: %d x %d , format: %s , line pitch : %d, \n->Shutter Speed (us) : %f\n", (pDev->serial.read()).c_str(),
+                    ROS_INFO("Info From %s :\n->Image count: %d \n->%s : %s \n->%s : %s \n->%s : %s \n->Image dimension: %d x %d , format: %s , line pitch : %d\n", (pDev->serial.read()).c_str(),
                        cnt, (statistics.framesPerSecond.name()).c_str(), statistics.framesPerSecond.readS().c_str(), (statistics.errorCount.name()).c_str(), statistics.errorCount.readS().c_str(),
                         (statistics.captureTime_s.name()).c_str(), statistics.captureTime_s.readS().c_str(), pRequest->imageWidth.read(), pRequest->imageHeight.read(), pRequest->imagePixelFormat.readS().c_str(),
-                          pRequest->imageLinePitch.read(), ac.exposureTime.read());
+                          pRequest->imageLinePitch.read() );
 
                 }
             }
