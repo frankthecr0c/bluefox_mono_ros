@@ -7,7 +7,7 @@ SET( bluefox_mono_ros_LIBRARIES "" )
 SET( bluefox_mono_ros_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include )
 
 FIND_PACKAGE(cmake_modules REQUIRED)
-FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(OpenCV 4 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem unit_test_framework REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
