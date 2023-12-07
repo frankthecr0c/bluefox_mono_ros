@@ -20,11 +20,23 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   image_transport
   camera_info_manager
+  message_generation
+)
+
+add_message_files(
+  FILES
+  ShutterSpeed.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
 )
 
 generate_dynamic_reconfigure_options(
   cfg/bluefox_conf.cfg
 )
+
 
 INCLUDE_DIRECTORIES(
   /opt/mvIMPACT_Acquire
@@ -49,7 +61,7 @@ LIST(APPEND SOURCEFILES
 )
 
 
-add_executable(bluefox_mono_node src/bluefox_mono.cpp)     
+add_executable(bluefox_mono_node src/bluefox_mono.cpp)
 target_link_libraries(bluefox_mono_node ${LINK_LIBS})
 
 #add_executable(bluefox_mono_lifo_node src/bluefox_mono_lifo.cpp)
@@ -71,3 +83,7 @@ install(DIRECTORY meshes/
 
 install(DIRECTORY urdf/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf)
+
+catkin_package(
+  CATKIN_DEPENDS message_runtime
+  )
