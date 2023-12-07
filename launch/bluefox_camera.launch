@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="bluefox_camera" pkg="bluefox_mono_ros" type="bluefox_mono_node" respawn="false" output="screen">
+    <!-- default values: -->
+  </node>
+</launch>
