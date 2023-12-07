@@ -1,0 +1,29 @@
+#Calibration with lens FIFO 4MM
+
+image_width: 640
+image_height: 480
+camera_name: Bluefox_mono
+camera_frame_id: bluefox_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [ 387.56228,    0.     ,  297.26004,
+            0.     ,  366.21306,  260.94553,
+            0.     ,    0.     ,    1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.140070, 0.087151, -0.001678, 0.001605, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [ 1.,  0.,  0.,
+          0.,  1.,  0.,
+          0.,  0.,  1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [ 374.66064,    0.     ,  301.00106,    0.     ,
+            0.     ,  354.68939,  258.39505,    0.     ,
+            0.     ,    0.     ,    1.     ,    0.     ]

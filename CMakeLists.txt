@@ -20,6 +20,17 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   image_transport
   camera_info_manager
+  message_generation
+)
+
+add_message_files(
+  FILES
+  ShutterSpeed.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
 )
 
 generate_dynamic_reconfigure_options(
@@ -62,3 +73,16 @@ add_dependencies(bluefox_mono_node ${PROJECT_NAME}_gencfg)
 include_directories(
   include ${catkin_INCLUDE_DIRS}
 )
+
+install(DIRECTORY launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
+install(DIRECTORY meshes/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/mesh)
+
+install(DIRECTORY urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf)
+
+catkin_package(
+  CATKIN_DEPENDS message_runtime
+  )
