@@ -257,7 +257,7 @@ bool liveLoop(Device* pDev)
     image_transport::ImageTransport it(n);
     cv_bridge::CvImage bridge_image;
     // publishers
-    camera_info_manager::CameraInfoManager camera_info_mgr(n,"Bluefox_mono");
+    camera_info_manager::CameraInfoManager camera_info_mgr(n,"bluefox_camera");
 	image_transport::CameraPublisher image_publisher(it.advertiseCamera("image_raw",100));
 	ros::Publisher shutter_sp_publisher = n.advertise<bluefox_mono_ros::ShutterSpeed>("shutter_speed", 100);
 
@@ -405,9 +405,14 @@ bool configureDevice( Device* pDev )
 //-----------------------------------------------------------------------------
 {
 
-  string settingName;
-  int width = 1280; //EDITARE max 1280
-  int height = 1024; //EDITARE max 1024
+  mvIMPACT::acquire::GenICam::ImageFormatControl ifc( pDev );
+
+  int width_max =ifc.widthMax.read();
+  int height_max = ifc.heightMax.read();
+
+  int width =width_max; //EDITARE
+  int height = height_max; //EDITARE
+
   /** 'PixelFormat' defines a dictionary. Valid values are:
   [17301512]: BayerGR8
   [17825804]: BayerGR10
@@ -476,8 +481,6 @@ bool configureDevice( Device* pDev )
             conditionalSetEnumPropertyByString( anctrl.gainAuto, "Off" );
         }
 
-        mvIMPACT::acquire::GenICam::ImageFormatControl ifc( pDev );
-
 
         if( width > 0 )
         {
@@ -499,8 +502,9 @@ bool configureDevice( Device* pDev )
         acquisitionMode = ac.acquisitionMode.readS();
 
 	//calculate offest if the original width = 1280 and height=1024 is different
-        int offsetX = ( (1280 - width) / 2 );
-        int offsetY = ( (1024 - height) / 2 );
+        int offsetX = ( (width_max - width) / 2 );
+        int offsetY = ( (height_max - height) / 2 );
+
         if(offsetX>0 && ifc.offsetX.isValid() && ifc.offsetX.isWriteable())
         {
           ifc.offsetX.write(offsetX);
