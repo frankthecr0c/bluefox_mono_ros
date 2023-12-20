@@ -38,7 +38,7 @@ generate_dynamic_reconfigure_options(
 )
 
 INCLUDE_DIRECTORIES(
-  /opt/mvIMPACT_acquire
+  /opt/mvIMPACT_Acquire
   include
   ${Eigen_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
